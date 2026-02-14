@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../data/models/chess_piece.dart';
-import '../../data/models/position.dart';
-import '../../data/models/chess_move.dart';
-import '../../domain/chess_engine/chess_board.dart';
-import '../../domain/chess_engine/move_validator.dart';
-import '../../domain/chess_engine/game_rules.dart';
+import 'package:myapp/data/models/chess_piece.dart';
+import 'package:myapp/data/models/position.dart';
+import 'package:myapp/data/models/chess_move.dart';
+import 'package:myapp/domain/chess_engine/chess_board.dart';
+import 'package:myapp/domain/chess_engine/move_validator.dart';
+import 'package:myapp/domain/chess_engine/game_rules.dart';
 
 /// Manages the chess game state using Provider
 class GameStateProvider extends ChangeNotifier {

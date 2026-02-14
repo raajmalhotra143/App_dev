@@ -165,10 +165,10 @@ class GameScreen extends StatelessWidget {
         }
 
         final whiteCaptured = capturedPieces
-            .where((p) => p.color.isWhite)
+            .where((p) => p.color == PieceColor.white)
             .toList();
         final blackCaptured = capturedPieces
-            .where((p) => p.color.isBlack)
+            .where((p) => p.color == PieceColor.black)
             .toList();
 
         return Card(
