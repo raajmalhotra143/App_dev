@@ -99,9 +99,9 @@ class GameControls extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: statusColor?.withOpacity(0.2),
+        color: statusColor.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: statusColor ?? Colors.transparent, width: 2),
+        border: Border.all(color: statusColor, width: 2),
       ),
       child: Text(
         statusText,

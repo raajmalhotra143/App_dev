@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../data/models/chess_piece.dart';
 import '../../presentation/providers/game_state_provider.dart';
 import '../../presentation/widgets/chess_board_widget.dart';
 import '../../presentation/widgets/game_controls.dart';
