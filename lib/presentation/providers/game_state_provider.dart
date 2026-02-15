@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/data/models/chess_piece.dart';
-import 'package:myapp/data/models/position.dart';
-import 'package:myapp/data/models/chess_move.dart';
-import 'package:myapp/domain/chess_engine/chess_board.dart';
-import 'package:myapp/domain/chess_engine/move_validator.dart';
-import 'package:myapp/domain/chess_engine/game_rules.dart';
+import '../../data/models/chess_piece.dart';
+import '../../data/models/position.dart';
+import '../../data/models/chess_move.dart';
+import '../../domain/chess_engine/chess_board.dart';
+import '../../domain/chess_engine/move_validator.dart';
+import '../../domain/chess_engine/game_rules.dart';
+import '../../domain/chess_engine/ai_engine.dart';
 
 /// Manages the chess game state using Provider
 class GameStateProvider extends ChangeNotifier {
@@ -15,17 +16,32 @@ class GameStateProvider extends ChangeNotifier {
   final PieceColor _playerColor; // Color assigned to the player
   final bool _isAIGame; // Whether playing against AI
   final bool _isLocalMultiplayer; // Whether local 2-player mode
+<<<<<<< HEAD
+=======
+  final int _aiDifficulty; // AI difficulty level (1-15)
+  bool _isAIThinking = false;
+>>>>>>> d1355e5a8686f6f14885954fdee35cb17b044c61
 
   GameStateProvider({
     PieceColor playerColor = PieceColor.white,
     bool isAIGame = false,
     bool isLocalMultiplayer = false,
-  }) : _board = ChessBoard.standardSetup(),
+    int aiDifficulty = 1,
+    String? fen,
+  }) : _board = fen != null
+           ? ChessBoard.fromFEN(fen)
+           : ChessBoard.standardSetup(),
        _gameStatus = GameStatus.ongoing,
        _legalMovesForSelectedPiece = [],
        _playerColor = playerColor,
        _isAIGame = isAIGame,
-       _isLocalMultiplayer = isLocalMultiplayer;
+       _isLocalMultiplayer = isLocalMultiplayer,
+       _aiDifficulty = aiDifficulty {
+    // If AI plays white (player selected black), AI moves first
+    if (_isAIGame && _playerColor == PieceColor.black) {
+      _makeAIMove();
+    }
+  }
 
   // Getters
   ChessBoard get board => _board;
@@ -38,6 +54,7 @@ class GameStateProvider extends ChangeNotifier {
       _playerColor == PieceColor.white ? PieceColor.black : PieceColor.white;
   bool get isAIGame => _isAIGame;
   bool get isLocalMultiplayer => _isLocalMultiplayer;
+  bool get isAIThinking => _isAIThinking;
   List<ChessMove> get moveHistory => _board.moveHistory;
   ChessMove? get lastMove =>
       _board.moveHistory.isNotEmpty ? _board.moveHistory.last : null;
@@ -45,6 +62,11 @@ class GameStateProvider extends ChangeNotifier {
 
   /// Selects a piece at the given position
   void selectPiece(Position position) {
+    if (_isAIThinking) return; // Prevent interaction while AI thinks
+
+    // In AI mode, prevent selecting opponent's pieces if not your turn
+    if (_isAIGame && _board.currentTurn != _playerColor) return;
+
     final piece = _board.getPieceAt(position);
 
     // Can only select pieces of the current turn
@@ -65,6 +87,7 @@ class GameStateProvider extends ChangeNotifier {
 
   /// Attempts to move a piece to the given position
   bool movePiece(Position to) {
+    if (_isAIThinking) return false;
     if (_selectedPosition == null) return false;
 
     // Find the move in legal moves
@@ -89,7 +112,42 @@ class GameStateProvider extends ChangeNotifier {
     _legalMovesForSelectedPiece = [];
 
     notifyListeners();
+
+    // Trigger AI move if applicable
+    if (_isAIGame &&
+        _gameStatus == GameStatus.ongoing &&
+        _board.currentTurn != _playerColor) {
+      _makeAIMove();
+    }
+
     return true;
+  }
+
+  /// Makes the AI move
+  Future<void> _makeAIMove() async {
+    _isAIThinking = true;
+    notifyListeners();
+
+    try {
+      // Small delay for UX so it doesn't feel instant/robotic
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      final bestMove = await AIEngine.getBestMove(_board, _aiDifficulty);
+
+      if (bestMove != null) {
+        _board.makeMove(bestMove);
+        _gameStatus = GameRules.getGameStatus(_board);
+      } else {
+        // AI has no moves? Should be handled by game status check, but just in case
+        if (GameRules.getGameStatus(_board) == GameStatus.ongoing) {
+          // Check for stalemate/mate if not already detected
+          _gameStatus = GameRules.getGameStatus(_board);
+        }
+      }
+    } finally {
+      _isAIThinking = false;
+      notifyListeners();
+    }
   }
 
   /// Handles click/tap on a square
@@ -97,6 +155,8 @@ class GameStateProvider extends ChangeNotifier {
     if (_gameStatus != GameStatus.ongoing && _gameStatus != GameStatus.check) {
       return; // Game is over
     }
+
+    if (_isAIThinking) return;
 
     // If a piece is already selected, try to move it
     if (_selectedPosition != null) {
@@ -122,14 +182,22 @@ class GameStateProvider extends ChangeNotifier {
     _gameStatus = GameStatus.ongoing;
     _selectedPosition = null;
     _legalMovesForSelectedPiece = [];
+    _isAIThinking = false;
+
     notifyListeners();
+
+    // If AI plays white, move first
+    if (_isAIGame && _playerColor == PieceColor.black) {
+      _makeAIMove();
+    }
   }
 
   /// Undoes the last move (if possible)
   void undoMove() {
     // This would require storing previous board states
     // For now, this is a placeholder
-    // TODO: Implement undo functionality with board state history
+    // TODO: Implement undo functionality in Phase 4
+    // void undoLastMove() { ... }
     notifyListeners();
   }
 
@@ -144,7 +212,12 @@ class GameStateProvider extends ChangeNotifier {
 
   /// Resigns the game
   void resign() {
-    _gameStatus = GameStatus.checkmate;
+    if (_isAIGame) {
+      // You lose
+      _gameStatus = GameStatus.checkmate; // effectively
+      // Logic to show "Black/White wins"
+    }
+    _gameStatus = GameStatus.checkmate; // treat as mate for now
     notifyListeners();
   }
 
