@@ -20,13 +20,17 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    _soundEnabled = prefs.getBool('soundEnabled') ?? true;
-    _volume = prefs.getDouble('volume') ?? 0.7;
-    _boardTheme = BoardTheme.values[prefs.getInt('boardTheme') ?? 0];
-    _showLegalMoves = prefs.getBool('showLegalMoves') ?? true;
-    _animationSpeed = prefs.getDouble('animationSpeed') ?? 1.0;
-    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _soundEnabled = prefs.getBool('soundEnabled') ?? true;
+      _volume = prefs.getDouble('volume') ?? 0.7;
+      _boardTheme = BoardTheme.values[prefs.getInt('boardTheme') ?? 0];
+      _showLegalMoves = prefs.getBool('showLegalMoves') ?? true;
+      _animationSpeed = prefs.getDouble('animationSpeed') ?? 1.0;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading settings: $e');
+    }
   }
 
   Future<void> setSoundEnabled(bool enabled) async {

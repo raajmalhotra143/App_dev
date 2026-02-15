@@ -6,6 +6,7 @@ import '../../domain/chess_engine/chess_board.dart';
 import '../../domain/chess_engine/move_validator.dart';
 import '../../domain/chess_engine/game_rules.dart';
 import '../../domain/chess_engine/ai_engine.dart';
+import '../../presentation/services/sound_service.dart';
 
 /// Manages the chess game state using Provider
 class GameStateProvider extends ChangeNotifier {
@@ -116,6 +117,17 @@ class GameStateProvider extends ChangeNotifier {
     // Update game status
     _gameStatus = GameRules.getGameStatus(_board);
 
+    // Play sound effect
+    if (_gameStatus == GameStatus.checkmate) {
+      SoundService().playCheckmate();
+    } else if (_gameStatus == GameStatus.check) {
+      SoundService().playCheck();
+    } else if (move.isCapture) {
+      SoundService().playCapture();
+    } else {
+      SoundService().playMove();
+    }
+
     // Clear selection
     _selectedPosition = null;
     _legalMovesForSelectedPiece = [];
@@ -154,6 +166,17 @@ class GameStateProvider extends ChangeNotifier {
 
         _board.makeMove(bestMove);
         _gameStatus = GameRules.getGameStatus(_board);
+
+        // Play sound effect for AI move
+        if (_gameStatus == GameStatus.checkmate) {
+          SoundService().playCheckmate();
+        } else if (_gameStatus == GameStatus.check) {
+          SoundService().playCheck();
+        } else if (bestMove.isCapture) {
+          SoundService().playCapture();
+        } else {
+          SoundService().playMove();
+        }
       } else {
         // AI has no moves? Should be handled by game status check, but just in case
         if (GameRules.getGameStatus(_board) == GameStatus.ongoing) {
