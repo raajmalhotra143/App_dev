@@ -66,6 +66,7 @@ class SettingsScreen extends StatelessWidget {
               return Column(
                 children: BoardTheme.values.map((theme) {
                   return RadioListTile<BoardTheme>(
+                    // ignore: deprecated_member_use
                     title: Row(
                       children: [
                         Text(theme.displayName),
@@ -96,7 +97,9 @@ class SettingsScreen extends StatelessWidget {
                       ],
                     ),
                     value: theme,
+                    // ignore: deprecated_member_use
                     groupValue: settings.boardTheme,
+                    // ignore: deprecated_member_use
                     onChanged: (value) {
                       if (value != null) {
                         settings.setBoardTheme(value);
