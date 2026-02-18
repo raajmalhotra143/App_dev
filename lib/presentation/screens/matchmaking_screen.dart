@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/services/supabase_service.dart';
+import 'gameplay_screen.dart';
 
 class MatchmakingScreen extends StatefulWidget {
   const MatchmakingScreen({super.key});
@@ -24,6 +26,31 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
       begin: 0.8,
       end: 1.2,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _startMatchmaking();
+  }
+
+  Future<void> _startMatchmaking() async {
+    try {
+      final gameId = await SupabaseService().joinRandomGame();
+      if (!mounted) return;
+
+      // Wait a moment to show the animation
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const GameplayScreen(),
+        ), // Pass gameId here if needed
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error joining game: $e')));
+    }
   }
 
   @override

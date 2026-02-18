@@ -8,11 +8,19 @@ import 'presentation/providers/theme_provider.dart';
 import 'presentation/screens/premium_hub_screen.dart';
 import 'core/theme/app_theme.dart';
 
+import 'core/services/supabase_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // TODO: Replace with your actual Supabase URL and Anon Key
+  const supabaseUrl = 'YOUR_SUPABASE_URL';
+  const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+
+  await SupabaseService.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
   runApp(const ChessApp());
 }

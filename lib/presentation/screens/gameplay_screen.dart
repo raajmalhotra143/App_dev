@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class GameplayScreen extends StatelessWidget {
-  const GameplayScreen({super.key});
+  final String? gameId;
+  const GameplayScreen({super.key, this.gameId});
 
   @override
   Widget build(BuildContext context) {
