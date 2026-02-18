@@ -41,9 +41,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const GameplayScreen(),
-        ), // Pass gameId here if needed
+        MaterialPageRoute(builder: (context) => GameplayScreen(gameId: gameId)),
       );
     } catch (e) {
       if (!mounted) return;
