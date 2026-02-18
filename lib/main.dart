@@ -5,7 +5,7 @@ import 'firebase_options.dart';
 import 'presentation/providers/game_setup_provider.dart';
 import 'presentation/providers/settings_provider.dart';
 import 'presentation/providers/theme_provider.dart';
-import 'presentation/screens/game_mode_screen.dart';
+import 'presentation/screens/premium_hub_screen.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
@@ -36,7 +36,7 @@ class ChessApp extends StatelessWidget {
             theme: AppTheme.lightTheme(),
             darkTheme: AppTheme.darkTheme(),
             themeMode: themeProvider.themeMode,
-            home: const GameModeScreen(),
+            home: const PremiumHubScreen(),
           );
         },
       ),
